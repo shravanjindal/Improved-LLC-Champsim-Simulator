@@ -2,6 +2,8 @@
 #define CACHE_H
 
 #include "memory_class.h"
+#include "LFUFinder.h"
+#include <unordered_map>
 
 // PAGE
 extern uint32_t PAGE_TABLE_LATENCY, SWAP_LATENCY;
@@ -80,6 +82,10 @@ extern uint32_t PAGE_TABLE_LATENCY, SWAP_LATENCY;
 
 class CACHE : public MEMORY {
   public:
+    //----------------------------------- Changes --------------------------------------------------------
+    LFUSetFinder leastFreqUsed;
+    map<std::pair<uint32_t, uint64_t>, std::pair<uint32_t, uint32_t>> Intermediate;
+    //----------------------------------------------------------------------------------------------------
     uint32_t cpu;
     const string NAME;
     const uint32_t NUM_SET, NUM_WAY, NUM_LINE, WQ_SIZE, RQ_SIZE, PQ_SIZE, MSHR_SIZE;
@@ -116,6 +122,12 @@ class CACHE : public MEMORY {
     // constructor
     CACHE(string v1, uint32_t v2, int v3, uint32_t v4, uint32_t v5, uint32_t v6, uint32_t v7, uint32_t v8) 
         : NAME(v1), NUM_SET(v2), NUM_WAY(v3), NUM_LINE(v4), WQ_SIZE(v5), RQ_SIZE(v6), PQ_SIZE(v7), MSHR_SIZE(v8) {
+
+        // // Initializing Queue
+        for (int i=0; i<LLC_SET;i++)
+        {
+            leastFreqUsed.insertSet(i, 16);
+        }
 
         LATENCY = 0;
 
